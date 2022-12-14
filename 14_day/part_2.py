@@ -36,14 +36,12 @@ def main():
 
     highestY += 2
 
-    additionalWidth = 1
-    for i in range(1, highestY + 2):
-        additionalWidth += 2
+    maxPyramidWidth = ((highestY + 1) * 2) + 1
 
-    centerWidth = additionalWidth // 2
+    centerWidth = maxPyramidWidth // 2
     correctionX = 500 - centerWidth
 
-    grid = [["." for i in range(0, additionalWidth + 1)] for j in range(lowestY, highestY + 1)]
+    grid = [["." for i in range(0, maxPyramidWidth + 1)] for j in range(lowestY, highestY + 1)]
 
     for i in range(len(grid[lowestY])):
         grid[highestY][i] = "#"
