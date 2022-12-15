@@ -12,8 +12,9 @@ def main():
 
     radiuses = []
 
-    # change this depending on input
     targetRow = 2000000
+    if sys.argv[1].find("test") != -1:
+        targetRow = 10
 
     for line in lines:
 

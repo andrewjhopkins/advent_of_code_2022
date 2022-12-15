@@ -2,7 +2,7 @@ import sys
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage py part_1.py input.txt")
+        print("Usage py part_2.py input.txt")
         return
     
     lines = getInput(sys.argv[1])
@@ -12,8 +12,12 @@ def main():
 
     radiuses = []
 
-    # change this depending on input
-    targetRow = 2000000
+    minimum = 0
+    maximum = 4000000
+
+    if sys.argv[1].find("test") != -1:
+        minimum = 0
+        maximum = 20
 
     for line in lines:
 
@@ -33,33 +37,42 @@ def main():
 
         radiuses.append(arcSize)
 
-    intervals = []
 
-    for i in range(len(sensors)):
-        diff = abs(targetRow - sensors[i][0])
-        if diff <= radiuses[i]:
+    for targetRow in range(minimum, maximum + 1):
 
-            intervals.append([sensors[i][1] - (radiuses[i] - diff), sensors[i][1] + (radiuses[i] - diff)])
+        intervals = []
 
-    intervals.sort()
+        for i in range(len(sensors)):
 
-    i = 1
-    while i < len(intervals):
-        if intervals[i][0] <= intervals[i - 1][1]:
-            intervals[i - 1][1] = max(intervals[i - 1][1], intervals[i][1])
-            intervals.pop(i)
-        else:
-            i += 1
+            diff = abs(targetRow - sensors[i][0])
+            if diff <= radiuses[i]:
 
-    output = 1
-    for interval in intervals:
-        output += (interval[1] - interval[0])
+                intervals.append([sensors[i][1] - (radiuses[i] - diff), sensors[i][1] + (radiuses[i] - diff)])
 
-    for beacon in beacons:
-        if (beacon[0] == targetRow and beacon[1] >= interval[0] and beacon[1] <= interval[1]):
-            output -= 1
+        intervals.sort()
 
-    print(output)
+        intervalIndex = 1
+
+        while intervalIndex < len(intervals):
+            if intervals[intervalIndex][0] <= intervals[intervalIndex - 1][1]:
+                intervals[intervalIndex - 1][1] = max(intervals[intervalIndex - 1][1], intervals[intervalIndex][1])
+                intervals.pop(intervalIndex)
+            else:
+                intervalIndex += 1
+
+        targetCol = minimum
+
+        while targetCol <= maximum:
+            for interval in intervals:
+                if interval[0] <= targetCol:
+                    targetCol = interval[1] + 1
+                    interval.pop(0)
+                    continue
+
+            if targetCol <= maximum:
+                print((targetCol * 4000000) + targetRow)
+                return
+
 
 def getInput(fileName): 
     lines = []
