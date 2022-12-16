@@ -1,4 +1,5 @@
 import sys
+from functools import cache
 
 class Node:
     def __init__(self, name, flowRate, valveConnectionsList):
@@ -6,14 +7,13 @@ class Node:
         self.flowRate = flowRate
         self.connections = valveConnectionsList 
 
+nodes = {}
 def main():
     if len(sys.argv) < 2:
         print("Usage py part_1.py input.txt")
         return
     
     lines = getInput(sys.argv[1])
-
-    nodes = {}
 
     valvesWithFlow = 0
 
@@ -37,46 +37,25 @@ def main():
         newNode = Node(valveName, flowRate, valveConnectionsList)
         nodes[valveName] = newNode
 
-    opened = set()
-    cache = {}
-
-    output = runSim("AA", nodes, 30, 0, opened, [], valvesWithFlow, cache, False)
-    print(output[0])
+    output = runSim("AA", 30, tuple([]))
+    print(output)
 
 
-def runSim(currentNode, nodes, minutes, currentRate, opened, prev, valvesWithFlow, cache, openValve):
-    if (currentNode, minutes, tuple(opened), openValve) in cache:
-        return cache[(currentNode, minutes, tuple(opened), openValve)]
-
-    if minutes <= 0 or len(opened) >= valvesWithFlow:
-        return (currentRate, prev)
-
+@cache
+def runSim(currentNode, minutes, visited):
+    if minutes <= 1:
+        return 0
+    
+    rate = 0
     node = nodes[currentNode]
+    for connectorNode in node.connections:
+        rate = max(rate, runSim(connectorNode, minutes - 1, visited))
 
-    if openValve and node.flowRate > 0 and currentNode not in opened:
-        minutes -= 1
-        currentRate += (minutes * node.flowRate)
-        opened.add(currentNode)
+    if currentNode not in visited and node.flowRate > 0:
+        visited = tuple(sorted([*visited, currentNode]))
+        rate = max(rate, runSim(currentNode, minutes - 1, visited) + node.flowRate * (minutes - 1))
 
-    maxOutput = currentRate
-    maxPrev = prev
-
-    for nextNode in node.connections:
-        newPrev = prev + [currentNode, currentRate]
-
-        output1 = runSim(nextNode, nodes, minutes - 1, currentRate, opened.copy(), newPrev, valvesWithFlow, cache, True)
-        output2 = runSim(nextNode, nodes, minutes - 1, currentRate, opened.copy(), newPrev, valvesWithFlow, cache, False)
-
-        maxOfTwo = output2 if output2[0] > output1[0] else output1
-
-        if maxOfTwo[0] > maxOutput:
-            maxOutput = maxOfTwo[0]
-            maxPrev = maxOfTwo[1]
-
-    cache[(currentNode, minutes, tuple(opened), openValve)] = (maxOutput, maxPrev)
-
-    return (maxOutput, maxPrev)
-
+    return rate
 
 def getInput(fileName): 
     lines = []
