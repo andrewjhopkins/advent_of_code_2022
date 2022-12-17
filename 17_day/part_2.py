@@ -105,9 +105,6 @@ def main():
                 print(total + firstNumHeight)
                 return
 
-                firstNumHeight = rockHeight
-                beforeNum = rockNum
-
             elif matchIndex is None and jetPatternIndex in found:
 
                 firstNumHeight = (len(grid) - highestRow) 
@@ -133,8 +130,6 @@ def main():
             # drawShape in starting position
             for coord in coordinates:
                 grid[coord[0]][coord[1]] = "@"
-
-            #printGrid(grid, "start")
 
             # Find out the jet pattern and update new coordinates
             jetDirection = jetPattern[jetPatternCounter % len(jetPattern)]
@@ -166,9 +161,6 @@ def main():
             else:
                 rockType.updateCoordinates(originalTopRow, originalLeftCol)
 
-            #printGrid(grid, "after " + jetDirection)
-
-
             coordinates = rockType.printCoordinates()
 
             originalTopRow = rockType.topRow
@@ -191,8 +183,6 @@ def main():
                 for coord in newDownCoordinates:
                     grid[coord[0]][coord[1]] = "@"
 
-                #printGrid(grid, "after down")
-
             else:
                 rockType.updateCoordinates(originalTopRow, originalLeftCol)
                 coordinates = rockType.printCoordinates()
@@ -203,17 +193,6 @@ def main():
 
                 heights[rockNum] = len(grid) - highestRow
                 break
-
-
-
-def printGrid(grid, text=""):
-    for g in grid:
-        print(g)
-
-    print(text)
-    print("\n")
-
-
 
 def getInput(fileName): 
     lines = []
