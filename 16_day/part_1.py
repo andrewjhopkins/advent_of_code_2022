@@ -15,14 +15,9 @@ def main():
     
     lines = getInput(sys.argv[1])
 
-    valvesWithFlow = 0
-
     for line in lines:
         valveName = line[6:8]
         flowRate = int(line[line.find("=") + 1: line.find(";")])
-
-        if flowRate > 0:
-            valvesWithFlow += 1
 
         valveConnectionsIndex = line.find("valve", line.find("tunnels"))
         valveConnectionsList = []
