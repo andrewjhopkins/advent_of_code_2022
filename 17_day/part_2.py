@@ -76,7 +76,9 @@ def main():
     highestRow = len(grid)
     jetPatternCounter = 0
 
-    for rockNum in range(2022):
+    heights = {}
+
+    for rockNum in range(0, 1000000000000):
         rockType = shapeRotation[rockNum % len(shapeRotation)]
         rockType.updateCoordinates(0, 2)
 
@@ -86,15 +88,21 @@ def main():
             if matchIndex is not None and jetPatternIndex == matchIndex:
                 rocksRemaining = 1000000000000 - beforeNum
                 rockDifference = rockNum - beforeNum
-                patterns = rocksRemaining // rockDifference
+
                 rockHeight = len(grid) - highestRow
 
                 # height per rockDifference
                 patternHeight = rockHeight - firstNumHeight
 
+                patterns = rocksRemaining // rockDifference
+                patternsRemaining = rocksRemaining % rockDifference
+
                 total = patternHeight * patterns
 
-                print(total + firstNumHeight, "total")
+                if patternsRemaining != 0:
+                    total += heights[beforeNum + patternsRemaining - 1] - heights[beforeNum]
+
+                print(total + firstNumHeight)
                 return
 
                 firstNumHeight = rockHeight
@@ -103,8 +111,6 @@ def main():
             elif matchIndex is None and jetPatternIndex in found:
 
                 firstNumHeight = (len(grid) - highestRow) 
-                print(len(grid) - highestRow, "firstNumHeight")
-                print(rockNum, "firstNum")
 
                 beforeNum = rockNum
                 matchIndex = jetPatternIndex
@@ -194,10 +200,10 @@ def main():
                 for coord in coordinates:
                     highestRow = min(coord[0], highestRow)
                     grid[coord[0]][coord[1]] = "#"
-                #printGrid(grid, "after down")
+
+                heights[rockNum] = len(grid) - highestRow
                 break
 
-    print(len(grid) - highestRow)
 
 
 def printGrid(grid, text=""):
