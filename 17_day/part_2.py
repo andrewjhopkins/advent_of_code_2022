@@ -67,12 +67,49 @@ def main():
     grid = [["." for j in range(7)] for i in range(4)]
     shapeRotation = [LineShape(), PlusShape(), LShape(), VertLineShape(), SquareShape()]
 
+    matchIndex = None
+    beforeNum = None
+    found = set()
+
+    firstNumHeight = None
+
     highestRow = len(grid)
     jetPatternCounter = 0
 
     for rockNum in range(2022):
         rockType = shapeRotation[rockNum % len(shapeRotation)]
         rockType.updateCoordinates(0, 2)
+
+        if isinstance(rockType, LineShape):
+            jetPatternIndex = jetPatternCounter % len(jetPattern)
+
+            if matchIndex is not None and jetPatternIndex == matchIndex:
+                rocksRemaining = 1000000000000 - beforeNum
+                rockDifference = rockNum - beforeNum
+                patterns = rocksRemaining // rockDifference
+                rockHeight = len(grid) - highestRow
+
+                # height per rockDifference
+                patternHeight = rockHeight - firstNumHeight
+
+                total = patternHeight * patterns
+
+                print(total + firstNumHeight, "total")
+                return
+
+                firstNumHeight = rockHeight
+                beforeNum = rockNum
+
+            elif matchIndex is None and jetPatternIndex in found:
+
+                firstNumHeight = (len(grid) - highestRow) 
+                print(len(grid) - highestRow, "firstNumHeight")
+                print(rockNum, "firstNum")
+
+                beforeNum = rockNum
+                matchIndex = jetPatternIndex
+            else:
+                found.add(jetPatternIndex)
 
         # Add height buffer
         while highestRow - rockType.bottomRow < 4:
@@ -90,6 +127,8 @@ def main():
             # drawShape in starting position
             for coord in coordinates:
                 grid[coord[0]][coord[1]] = "@"
+
+            #printGrid(grid, "start")
 
             # Find out the jet pattern and update new coordinates
             jetDirection = jetPattern[jetPatternCounter % len(jetPattern)]
@@ -121,6 +160,9 @@ def main():
             else:
                 rockType.updateCoordinates(originalTopRow, originalLeftCol)
 
+            #printGrid(grid, "after " + jetDirection)
+
+
             coordinates = rockType.printCoordinates()
 
             originalTopRow = rockType.topRow
@@ -143,6 +185,8 @@ def main():
                 for coord in newDownCoordinates:
                     grid[coord[0]][coord[1]] = "@"
 
+                #printGrid(grid, "after down")
+
             else:
                 rockType.updateCoordinates(originalTopRow, originalLeftCol)
                 coordinates = rockType.printCoordinates()
@@ -150,6 +194,7 @@ def main():
                 for coord in coordinates:
                     highestRow = min(coord[0], highestRow)
                     grid[coord[0]][coord[1]] = "#"
+                #printGrid(grid, "after down")
                 break
 
     print(len(grid) - highestRow)
